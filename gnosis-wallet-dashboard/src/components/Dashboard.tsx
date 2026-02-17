@@ -1,0 +1,158 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { getWalletData } from "@/lib/covalent";
+import { formatUnits } from "viem";
+
+interface DashboardProps {
+  address: string;
+}
+
+export function Dashboard({ address }: DashboardProps) {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const walletData = await getWalletData(address);
+        setData(walletData);
+      } catch (err) {
+        setError("Failed to load wallet data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [address]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-20 text-red-400">
+        {error}
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const formatBalance = (balance: string, decimals: number) => {
+    return parseFloat(formatUnits(BigInt(balance), decimals)).toFixed(4);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const truncateAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Total Value Card */}
+      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-2">Total Portfolio Value</h2>
+        <p className="text-4xl font-bold text-white">
+          ${data.totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </p>
+      </div>
+
+      {/* Native Balance */}
+      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Native Balance (xDAI)</h2>
+        <div className="flex justify-between items-center">
+          <span className="text-2xl font-semibold">
+            {formatBalance(data.nativeBalance.balance, 18)} xDAI
+          </span>
+          <span className="text-green-400">
+            ${data.nativeBalance.quote.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        </div>
+      </div>
+
+      {/* Token Balances */}
+      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Token Balances</h2>
+        {data.tokens.length === 0 ? (
+          <p className="text-gray-500">No tokens found</p>
+        ) : (
+          <div className="space-y-3">
+            {data.tokens.map((token: any, index: number) => (
+              <div key={index} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-0">
+                <div className="flex items-center gap-3">
+                  {token.logo_url && (
+                    <img src={token.logo_url} alt={token.contract_name} className="w-8 h-8 rounded-full" />
+                  )}
+                  <div>
+                    <p className="font-medium">{token.contract_name}</p>
+                    <p className="text-sm text-gray-400">{token.contract_ticker_symbol}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-medium">
+                    {formatBalance(token.balance, token.contract_decimals)} {token.contract_ticker_symbol}
+                  </p>
+                  <p className="text-sm text-green-400">
+                    ${token.quote.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Transaction History */}
+      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Recent Transactions</h2>
+        {data.transactions.length === 0 ? (
+          <p className="text-gray-500">No transactions found</p>
+        ) : (
+          <div className="space-y-3">
+            {data.transactions.map((tx: any, index: number) => (
+              <div key={index} className="py-3 border-b border-gray-700 last:border-0">
+                <div className="flex justify-between items-start mb-1">
+                  <span className="text-sm text-gray-400">{formatDate(tx.block_signed_at)}</span>
+                  <a 
+                    href={`https://gnosisscan.io/tx/${tx.tx_hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 text-sm"
+                  >
+                    {truncateAddress(tx.tx_hash)}
+                  </a>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <div className="text-gray-400">
+                    From: {truncateAddress(tx.from_address)}
+                  </div>
+                  <div className="text-gray-400">
+                    To: {truncateAddress(tx.to_address)}
+                  </div>
+                </div>
+                <div className="mt-1 text-right">
+                  <span className={tx.from_address.toLowerCase() === address.toLowerCase() ? "text-red-400" : "text-green-400"}>
+                    {tx.from_address.toLowerCase() === address.toLowerCase() ? "-" : "+"}
+                    ${tx.value_quote.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
