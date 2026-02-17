@@ -109,13 +109,20 @@ export function Dashboard({ address }: DashboardProps) {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
+  const safeToLocaleString = (value: number | null | undefined, defaultValue: string = "0.00") => {
+    if (value === null || value === undefined || isNaN(value)) {
+      return defaultValue;
+    }
+    return value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   return (
     <div className="space-y-8">
       {/* Total Value Card */}
       <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
         <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-2">Total Portfolio Value</h2>
         <p className="text-4xl font-bold text-white">
-          ${data.totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          ${safeToLocaleString(data.totalValue)}
         </p>
       </div>
 
@@ -124,10 +131,10 @@ export function Dashboard({ address }: DashboardProps) {
         <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Native Balance (xDAI)</h2>
         <div className="flex justify-between items-center">
           <span className="text-2xl font-semibold">
-            {formatBalance(data.nativeBalance.balance, 18)} xDAI
+            {formatBalance(data.nativeBalance?.balance || "0", 18)} xDAI
           </span>
           <span className="text-green-400">
-            ${data.nativeBalance.quote.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            ${safeToLocaleString(data.nativeBalance?.quote)}
           </span>
         </div>
       </div>
@@ -135,27 +142,27 @@ export function Dashboard({ address }: DashboardProps) {
       {/* Token Balances */}
       <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
         <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Token Balances</h2>
-        {data.tokens.length === 0 ? (
+        {!data.tokens || data.tokens.length === 0 ? (
           <p className="text-gray-500">No tokens found</p>
         ) : (
           <div className="space-y-3">
             {data.tokens.map((token, index) => (
               <div key={index} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-0">
                 <div className="flex items-center gap-3">
-                  {token.logo_url && (
-                    <img src={token.logo_url} alt={token.contract_name} className="w-8 h-8 rounded-full" />
+                  {token?.logo_url && (
+                    <img src={token.logo_url} alt={token.contract_name || "Token"} className="w-8 h-8 rounded-full" />
                   )}
                   <div>
-                    <p className="font-medium">{token.contract_name}</p>
-                    <p className="text-sm text-gray-400">{token.contract_ticker_symbol}</p>
+                    <p className="font-medium">{token?.contract_name || "Unknown Token"}</p>
+                    <p className="text-sm text-gray-400">{token?.contract_ticker_symbol || "???"}</p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="font-medium">
-                    {formatBalance(token.balance, token.contract_decimals)} {token.contract_ticker_symbol}
+                    {formatBalance(token?.balance || "0", token?.contract_decimals || 18)} {token?.contract_ticker_symbol || ""}
                   </p>
                   <p className="text-sm text-green-400">
-                    ${token.quote.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${safeToLocaleString(token?.quote)}
                   </p>
                 </div>
               </div>
@@ -167,35 +174,35 @@ export function Dashboard({ address }: DashboardProps) {
       {/* Transaction History */}
       <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
         <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Recent Transactions</h2>
-        {data.transactions.length === 0 ? (
+        {!data.transactions || data.transactions.length === 0 ? (
           <p className="text-gray-500">No transactions found</p>
         ) : (
           <div className="space-y-3">
             {data.transactions.map((tx, index) => (
               <div key={index} className="py-3 border-b border-gray-700 last:border-0">
                 <div className="flex justify-between items-start mb-1">
-                  <span className="text-sm text-gray-400">{formatDate(tx.block_signed_at)}</span>
+                  <span className="text-sm text-gray-400">{formatDate(tx?.block_signed_at)}</span>
                   <a 
-                    href={`https://gnosisscan.io/tx/${tx.tx_hash}`}
+                    href={`https://gnosisscan.io/tx/${tx?.tx_hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 text-sm"
                   >
-                    {truncateAddress(tx.tx_hash)}
+                    {truncateAddress(tx?.tx_hash || "")}
                   </a>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <div className="text-gray-400">
-                    From: {truncateAddress(tx.from_address)}
+                    From: {truncateAddress(tx?.from_address || "")}
                   </div>
                   <div className="text-gray-400">
-                    To: {truncateAddress(tx.to_address)}
+                    To: {truncateAddress(tx?.to_address || "")}
                   </div>
                 </div>
                 <div className="mt-1 text-right">
-                  <span className={tx.from_address.toLowerCase() === address.toLowerCase() ? "text-red-400" : "text-green-400"}>
-                    {tx.from_address.toLowerCase() === address.toLowerCase() ? "-" : "+"}
-                    ${tx.value_quote.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className={tx?.from_address?.toLowerCase() === address.toLowerCase() ? "text-red-400" : "text-green-400"}>
+                    {tx?.from_address?.toLowerCase() === address.toLowerCase() ? "-" : "+"}
+                    ${safeToLocaleString(tx?.value_quote)}
                   </span>
                 </div>
               </div>
