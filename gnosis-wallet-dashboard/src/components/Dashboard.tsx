@@ -45,7 +45,9 @@ export function Dashboard({ address }: DashboardProps) {
         setError(null);
         
         console.log("Fetching wallet data for address:", address);
-        const response = await fetch(`/api/wallet-data?address=${address}`);
+        const response = await fetch(`/api/wallet-data?address=${address}`, {
+          cache: 'no-store'
+        });
         console.log("Response status:", response.status);
         
         if (!response.ok) {
