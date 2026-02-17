@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Gnosis Chain Wallet Dashboard",
-  description: "View your Gnosis Chain wallet stats",
+  title: "Gnosis Chain Wallet Dashboard - Bread Cooperative",
+  description: "View your Gnosis Chain wallet stats with Bread Cooperative styling",
 };
 
 export default function RootLayout({
@@ -17,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className="bg-paper-main text-text-standard min-h-screen">
         <Providers>{children}</Providers>
       </body>
     </html>

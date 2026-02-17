@@ -2,24 +2,124 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Bread Coop Fonts */
+@font-face {
+  font-family: "Bread Display";
+  src: url("/fonts/PogacaDisplayBlack.woff2") format("woff2");
+  font-weight: 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Display";
+  src: url("/fonts/PogacaDisplayBold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Display";
+  src: url("/fonts/PogacaDisplayRegular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Body";
+  src: url("/fonts/PogacaBodyRegular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bread Body";
+  src: url("/fonts/PogacaBodyBold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 15, 23, 42;
-  --background-end-rgb: 30, 41, 59;
+  --background: #f6f3eb;
+  --foreground: #171414;
+  --font-breadDisplay: "Bread Display", ui-sans-serif, system-ui, sans-serif;
+  --font-breadBody: "Bread Body", ui-sans-serif, system-ui, sans-serif;
+  --font-roboto: ui-monospace, monospace;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
-  );
-  min-height: 100vh;
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-breadBody);
+    min-height: 100vh;
+  }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  .text-h1 {
+    @apply font-breadDisplay font-[900] text-[3rem] leading-[36px] md:text-[96px] md:leading-[76px] xl:text-[7rem] xl:leading-[83px] tracking-tight uppercase;
+  }
+  .text-h2 {
+    @apply font-breadDisplay font-[900] text-[3rem] xl:text-[80px] leading-[36px] xl:leading-[63px] tracking-tighter;
+  }
+  .text-h3 {
+    @apply font-breadDisplay font-[900] text-[1.5rem] leading-[20px] md:text-[2.5rem] md:leading-[36px] xl:text-[3rem] xl:leading-[48px] tracking-tight;
+  }
+  .text-h4 {
+    @apply font-breadBody font-[700] text-[24px] xl:text-[2rem] leading-[24px] xl:leading-[2rem];
+  }
+  .text-h5 {
+    @apply font-breadBody font-[400] text-[1rem] xl:text-[1.5rem] xl:leading-[24px];
+  }
+  .text-body {
+    @apply font-breadBody text-base;
+  }
+
+  .text-breadDisplay-bold {
+    @apply font-breadDisplay font-[700];
+  }
+  .text-breadDisplay {
+    @apply font-breadDisplay font-[500];
+  }
+  .text-body-bold {
+    @apply font-breadBody text-base font-[700];
+  }
+  .text-caption {
+    @apply font-breadBody text-[0.7rem];
+  }
+
+  /* LiftedButton Components */
+  .lifted-button-base {
+    @apply mb-1 relative z-10 inline-flex items-center justify-center gap-[8px] font-breadBody text-base px-[37px] h-14 cursor-pointer;
+  }
+
+  .lifted-button {
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+  }
+
+  .lifted-button:hover {
+    background-color: var(--btn-hover-bg);
+    color: var(--btn-hover-text);
+  }
+
+  .lifted-button-disabled {
+    @apply bg-surface-grey opacity-50 cursor-not-allowed;
+  }
+
+  .lifted-button-shadow {
+    @apply absolute mb-1 inset-0 bg-surface-grey-2;
+  }
+
+  .lifted-button-motion {
+    @apply transition-all ease-out;
+  }
+
+  .lifted-button-lifted {
+    @apply -translate-x-0.5 -translate-y-0.5;
+  }
+
+  .lifted-button-active {
+    @apply group-active:translate-x-0.5 group-active:translate-y-0.5;
   }
 }

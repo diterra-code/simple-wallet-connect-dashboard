@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatUnits } from "viem";
+import LiftedButton from "./LiftedButton";
 
 interface DashboardProps {
   address: string;
@@ -80,21 +81,21 @@ export function Dashboard({ address }: DashboardProps) {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-orange"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-20">
-        <div className="text-red-400 mb-4">{error}</div>
-        <button 
+      <div className="text-center py-20 bg-paper-0 rounded-2xl border border-paper-2 p-12">
+        <div className="text-system-red mb-4 text-h5">{error}</div>
+        <LiftedButton 
+          preset="primary"
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors"
         >
           Retry
-        </button>
+        </LiftedButton>
       </div>
     );
   }
@@ -127,49 +128,49 @@ export function Dashboard({ address }: DashboardProps) {
   return (
     <div className="space-y-8">
       {/* Total Value Card */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-        <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-2">Total Portfolio Value</h2>
-        <p className="text-4xl font-bold text-white">
+      <div className="bg-paper-0 rounded-2xl p-8 border border-paper-2 shadow-sm">
+        <h2 className="text-caption text-surface-grey uppercase tracking-wide mb-2">Total Portfolio Value</h2>
+        <p className="text-h2 text-primary-orange">
           ${safeToLocaleString(data.totalValue)}
         </p>
       </div>
 
       {/* Native Balance */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-        <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Native Balance (xDAI)</h2>
+      <div className="bg-paper-0 rounded-2xl p-8 border border-paper-2 shadow-sm">
+        <h2 className="text-caption text-surface-grey uppercase tracking-wide mb-4">Native Balance (xDAI)</h2>
         <div className="flex justify-between items-center">
-          <span className="text-2xl font-semibold">
+          <span className="text-h4 text-text-standard">
             {formatBalance(data.nativeBalance?.balance || "0", 18)} xDAI
           </span>
-          <span className="text-green-400">
+          <span className="text-h4 text-system-green">
             ${safeToLocaleString(data.nativeBalance?.quote)}
           </span>
         </div>
       </div>
 
       {/* Token Balances */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-        <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Token Balances</h2>
+      <div className="bg-paper-0 rounded-2xl p-8 border border-paper-2 shadow-sm">
+        <h2 className="text-caption text-surface-grey uppercase tracking-wide mb-6">Token Balances</h2>
         {!data.tokens || data.tokens.length === 0 ? (
-          <p className="text-gray-500">No tokens found</p>
+          <p className="text-surface-grey text-body">No tokens found</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {data.tokens.map((token, index) => (
-              <div key={index} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-0">
+              <div key={index} className="flex justify-between items-center py-3 border-b border-paper-1 last:border-0">
                 <div className="flex items-center gap-3">
                   {token?.logo_url && (
-                    <img src={token.logo_url} alt={token.contract_name || "Token"} className="w-8 h-8 rounded-full" />
+                    <img src={token.logo_url} alt={token.contract_name || "Token"} className="w-10 h-10 rounded-full" />
                   )}
                   <div>
-                    <p className="font-medium">{token?.contract_name || "Unknown Token"}</p>
-                    <p className="text-sm text-gray-400">{token?.contract_ticker_symbol || "???"}</p>
+                    <p className="font-breadBody font-bold text-text-standard">{token?.contract_name || "Unknown Token"}</p>
+                    <p className="text-sm text-surface-grey">{token?.contract_ticker_symbol || "???"}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">
+                  <p className="font-breadBody font-bold text-text-standard">
                     {formatBalance(token?.balance || "0", token?.contract_decimals || 18)} {token?.contract_ticker_symbol || ""}
                   </p>
-                  <p className="text-sm text-green-400">
+                  <p className="text-sm text-system-green">
                     ${safeToLocaleString(token?.quote)}
                   </p>
                 </div>
@@ -180,35 +181,35 @@ export function Dashboard({ address }: DashboardProps) {
       </div>
 
       {/* Transaction History */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-        <h2 className="text-gray-400 text-sm uppercase tracking-wide mb-4">Recent Transactions</h2>
+      <div className="bg-paper-0 rounded-2xl p-8 border border-paper-2 shadow-sm">
+        <h2 className="text-caption text-surface-grey uppercase tracking-wide mb-6">Recent Transactions</h2>
         {!data.transactions || data.transactions.length === 0 ? (
-          <p className="text-gray-500">No transactions found</p>
+          <p className="text-surface-grey text-body">No transactions found</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {data.transactions.map((tx, index) => (
-              <div key={index} className="py-3 border-b border-gray-700 last:border-0">
-                <div className="flex justify-between items-start mb-1">
-                  <span className="text-sm text-gray-400">{formatDate(tx?.block_signed_at)}</span>
+              <div key={index} className="py-4 border-b border-paper-1 last:border-0">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="text-sm text-surface-grey">{formatDate(tx?.block_signed_at)}</span>
                   <a 
                     href={`https://gnosisscan.io/tx/${tx?.tx_hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 text-sm"
+                    className="text-primary-blue hover:text-blue-2 text-sm font-bold"
                   >
                     {truncateAddress(tx?.tx_hash || "")}
                   </a>
                 </div>
-                <div className="flex justify-between items-center text-sm">
-                  <div className="text-gray-400">
+                <div className="flex justify-between items-center text-sm mb-2">
+                  <div className="text-surface-grey">
                     From: {truncateAddress(tx?.from_address || "")}
                   </div>
-                  <div className="text-gray-400">
+                  <div className="text-surface-grey">
                     To: {truncateAddress(tx?.to_address || "")}
                   </div>
                 </div>
-                <div className="mt-1 text-right">
-                  <span className={tx?.from_address?.toLowerCase() === address.toLowerCase() ? "text-red-400" : "text-green-400"}>
+                <div className="text-right">
+                  <span className={tx?.from_address?.toLowerCase() === address.toLowerCase() ? "text-system-red font-bold" : "text-system-green font-bold"}>
                     {tx?.from_address?.toLowerCase() === address.toLowerCase() ? "-" : "+"}
                     ${safeToLocaleString(tx?.value_quote)}
                   </span>
