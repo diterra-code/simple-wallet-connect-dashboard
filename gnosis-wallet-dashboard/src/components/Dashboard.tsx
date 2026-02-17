@@ -69,8 +69,8 @@ export function Dashboard({ address }: DashboardProps) {
     if (address) {
       fetchData();
       
-      // Auto-refresh every 5 seconds
-      const intervalId = setInterval(fetchData, 5000);
+      // Auto-refresh every 30 seconds
+      const intervalId = setInterval(fetchData, 30000);
       
       // Clean up interval on unmount
       return () => clearInterval(intervalId);
