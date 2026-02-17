@@ -1,15 +1,40 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getWalletData } from "@/lib/covalent";
 import { formatUnits } from "viem";
 
 interface DashboardProps {
   address: string;
 }
 
+interface WalletData {
+  address: string;
+  nativeBalance: {
+    balance: string;
+    quote: number;
+  };
+  tokens: Array<{
+    contract_name: string;
+    contract_ticker_symbol: string;
+    balance: string;
+    quote: number;
+    contract_decimals: number;
+    logo_url: string;
+  }>;
+  transactions: Array<{
+    tx_hash: string;
+    from_address: string;
+    to_address: string;
+    value: string;
+    value_quote: number;
+    block_signed_at: string;
+    fees_paid: string;
+  }>;
+  totalValue: number;
+}
+
 export function Dashboard({ address }: DashboardProps) {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<WalletData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,16 +42,28 @@ export function Dashboard({ address }: DashboardProps) {
     async function fetchData() {
       try {
         setLoading(true);
-        const walletData = await getWalletData(address);
+        setError(null);
+        
+        const response = await fetch(`/api/wallet-data?address=${address}`);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to load wallet data");
+        }
+        
+        const walletData = await response.json();
         setData(walletData);
       } catch (err) {
-        setError("Failed to load wallet data");
+        console.error("Error fetching wallet data:", err);
+        setError(err instanceof Error ? err.message : "Failed to load wallet data");
       } finally {
         setLoading(false);
       }
     }
 
-    fetchData();
+    if (address) {
+      fetchData();
+    }
   }, [address]);
 
   if (loading) {
@@ -39,8 +76,14 @@ export function Dashboard({ address }: DashboardProps) {
 
   if (error) {
     return (
-      <div className="text-center py-20 text-red-400">
-        {error}
+      <div className="text-center py-20">
+        <div className="text-red-400 mb-4">{error}</div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition-colors"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -48,7 +91,11 @@ export function Dashboard({ address }: DashboardProps) {
   if (!data) return null;
 
   const formatBalance = (balance: string, decimals: number) => {
-    return parseFloat(formatUnits(BigInt(balance), decimals)).toFixed(4);
+    try {
+      return parseFloat(formatUnits(BigInt(balance), decimals)).toFixed(4);
+    } catch {
+      return "0";
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -89,7 +136,7 @@ export function Dashboard({ address }: DashboardProps) {
           <p className="text-gray-500">No tokens found</p>
         ) : (
           <div className="space-y-3">
-            {data.tokens.map((token: any, index: number) => (
+            {data.tokens.map((token, index) => (
               <div key={index} className="flex justify-between items-center py-2 border-b border-gray-700 last:border-0">
                 <div className="flex items-center gap-3">
                   {token.logo_url && (
@@ -121,7 +168,7 @@ export function Dashboard({ address }: DashboardProps) {
           <p className="text-gray-500">No transactions found</p>
         ) : (
           <div className="space-y-3">
-            {data.transactions.map((tx: any, index: number) => (
+            {data.transactions.map((tx, index) => (
               <div key={index} className="py-3 border-b border-gray-700 last:border-0">
                 <div className="flex justify-between items-start mb-1">
                   <span className="text-sm text-gray-400">{formatDate(tx.block_signed_at)}</span>
