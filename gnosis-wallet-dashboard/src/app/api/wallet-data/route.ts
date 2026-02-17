@@ -38,8 +38,16 @@ export async function GET(request: NextRequest) {
       { headers, next: { revalidate: 60 } }
     );
 
-    if (!balancesRes.ok || !transactionsRes.ok) {
-      throw new Error("Failed to fetch wallet data from Covalent");
+    if (!balancesRes.ok) {
+      const errorText = await balancesRes.text();
+      console.error("Covalent balances error:", balancesRes.status, errorText);
+      throw new Error(`Covalent balances API error: ${balancesRes.status}`);
+    }
+    
+    if (!transactionsRes.ok) {
+      const errorText = await transactionsRes.text();
+      console.error("Covalent transactions error:", transactionsRes.status, errorText);
+      throw new Error(`Covalent transactions API error: ${transactionsRes.status}`);
     }
 
     const balancesData = await balancesRes.json();

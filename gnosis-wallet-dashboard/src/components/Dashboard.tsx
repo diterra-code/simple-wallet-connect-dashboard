@@ -44,11 +44,14 @@ export function Dashboard({ address }: DashboardProps) {
         setLoading(true);
         setError(null);
         
+        console.log("Fetching wallet data for address:", address);
         const response = await fetch(`/api/wallet-data?address=${address}`);
+        console.log("Response status:", response.status);
         
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to load wallet data");
+          const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+          console.error("API Error:", errorData);
+          throw new Error(errorData.error || `Failed to load wallet data (${response.status})`);
         }
         
         const walletData = await response.json();
