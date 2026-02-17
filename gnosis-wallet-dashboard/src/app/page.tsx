@@ -4,7 +4,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { Dashboard } from "@/components/Dashboard";
 import { Logo } from "@/components/Logo";
-import LiftedButton from "@/components/LiftedButton";
+import { LiftedButton } from "@/components/LiftedButton";
 import "@rainbow-me/rainbowkit/styles.css";
 
 export default function Home() {

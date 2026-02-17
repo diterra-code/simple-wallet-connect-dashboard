@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatUnits } from "viem";
-import LiftedButton from "./LiftedButton";
+import { LiftedButton } from "./LiftedButton";
 
 interface DashboardProps {
   address: string;
