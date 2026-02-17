@@ -26,16 +26,16 @@ export async function GET(request: NextRequest) {
       Authorization: `Bearer ${COVALENT_API_KEY}`,
     };
 
-    // Get balances
+    // Get balances (no cache)
     const balancesRes = await fetch(
       `${COVALENT_BASE_URL}/gnosis-mainnet/address/${address}/balances_v2/`,
-      { headers, next: { revalidate: 60 } }
+      { headers, cache: 'no-store' }
     );
 
-    // Get transactions
+    // Get transactions (no cache)
     const transactionsRes = await fetch(
       `${COVALENT_BASE_URL}/gnosis-mainnet/address/${address}/transactions_v3/?limit=20`,
-      { headers, next: { revalidate: 60 } }
+      { headers, cache: 'no-store' }
     );
 
     if (!balancesRes.ok) {
