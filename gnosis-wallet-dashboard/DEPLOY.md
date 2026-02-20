@@ -1,0 +1,1 @@
+# Gnosis Chain Wallet Dashboard
